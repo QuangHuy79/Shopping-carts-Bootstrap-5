@@ -1,5 +1,7 @@
 import React from "react";
 import FieldInputCardDetails from "./FieldInputCardDetails";
+import CardTypeSelector from "./CardTypeSelector";
+import { calculateOrder } from "./orderUtils"; // <-- import hàm tính toán
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 
@@ -17,19 +19,6 @@ function CardDetails() {
               alt="Avatar"
             />
           </div>
-          <p className="small mb-2">Card type</p>
-          <a href="#!" type="submit" className="text-white ">
-            <i className="fab fa-cc-mastercard fa-2x me-2" />
-          </a>
-          <a href="#!" type="submit" className="text-white">
-            <i className="fab fa-cc-visa fa-2x me-2" />
-          </a>
-          <a href="#!" type="submit" className="text-white">
-            <i className="fab fa-cc-amex fa-2x me-2" />
-          </a>
-          <a href="#!" type="submit" className="text-white">
-            <i className="fab fa-cc-paypal fa-2x" />
-          </a>
 
           <Formik
             initialValues={{
@@ -39,6 +28,7 @@ function CardDetails() {
               cvv: "",
               quantity: 1,
               shippingMethod: "standard",
+              cardType: "", // 👈 thêm vào đây
             }}
             validationSchema={Yup.object({
               cardholderName: Yup.string()
@@ -64,24 +54,33 @@ function CardDetails() {
                 .oneOf(["standard", "express"], "Không hợp lệ"),
             })}
             onSubmit={(values) => {
-              const price = 1000;
-              const shipping = values.shippingMethod === "express" ? 20 : 10;
-              const subtotal = values.quantity * price;
-              const total = subtotal + shipping;
-
+              const { total } = calculateOrder(values);
               console.log("Tổng:", total);
               console.log("Giá trị form:", values);
             }}
           >
             {({ values, errors, touched, handleChange }) => {
-              const price = 1000;
-              const shipping = values.shippingMethod === "express" ? 20 : 10;
-              const subtotal = values.quantity * price;
-              const total = subtotal + shipping;
+              const { subtotal, shipping, total } = calculateOrder(values);
+              //   onSubmit={(values) => {
+              //     const price = 1000;
+              //     const shipping = values.shippingMethod === "express" ? 20 : 10;
+              //     const subtotal = values.quantity * price;
+              //     const total = subtotal + shipping;
+
+              //     console.log("Tổng:", total);
+              //     console.log("Giá trị form:", values);
+              //   }}
+              // >
+              //   {({ values, errors, touched, handleChange }) => {
+              //     const price = 1000;
+              //     const shipping = values.shippingMethod === "express" ? 20 : 10;
+              //     const subtotal = values.quantity * price;
+              //     const total = subtotal + shipping;
 
               return (
                 <Form>
                   <div className="mt-4">
+                    <CardTypeSelector></CardTypeSelector>
                     <FieldInputCardDetails
                       name="cardholderName"
                       label="Cardholder's Name"
