@@ -1,7 +1,7 @@
 import React from "react";
 import FieldInputCardDetails from "./FieldInputCardDetails";
 import { Formik, Form } from "formik";
-import { MDBInput } from "mdb-react-ui-kit";
+import * as Yup from "yup";
 
 function CardDetails() {
   return (
@@ -30,85 +30,174 @@ function CardDetails() {
           <a href="#!" type="submit" className="text-white">
             <i className="fab fa-cc-paypal fa-2x" />
           </a>
-          {/* ✅ Bắt đầu Formik form ở đây */}
+
           <Formik
             initialValues={{
               cardholderName: "",
               cardNumber: "",
               exp: "",
               cvv: "",
+              quantity: 1,
+              shippingMethod: "standard",
             }}
+            validationSchema={Yup.object({
+              cardholderName: Yup.string()
+                .matches(/^[A-Za-z\s'-]+$/, "Tên không hợp lệ")
+                .required("Bắt buộc"),
+              cardNumber: Yup.string()
+                .matches(/^[0-9]{16}$/, "Số thẻ phải gồm 16 chữ số")
+                .required("Bắt buộc"),
+              exp: Yup.string()
+                .required("Bắt buộc")
+                .matches(
+                  /^(0[1-9]|1[0-2])\/\d{4}$/,
+                  "Định dạng không hợp lệ (MM/YYYY)"
+                ),
+              cvv: Yup.string()
+                .required("Bắt buộc")
+                .matches(/^\d{3,4}$/, "CVV phải là 3 hoặc 4 số"),
+              quantity: Yup.number()
+                .required("Bắt buộc")
+                .min(1, "Tối thiểu là 1 sản phẩm"),
+              shippingMethod: Yup.string()
+                .required("Chọn phương thức giao hàng")
+                .oneOf(["standard", "express"], "Không hợp lệ"),
+            })}
             onSubmit={(values) => {
-              console.log("Form values", values);
+              const price = 1000;
+              const shipping = values.shippingMethod === "express" ? 20 : 10;
+              const subtotal = values.quantity * price;
+              const total = subtotal + shipping;
+
+              console.log("Tổng:", total);
+              console.log("Giá trị form:", values);
             }}
           >
-            <Form>
-              <div className="mt-4">
-                <FieldInputCardDetails
-                  name="cardholderName"
-                  label="Cardholder's Name"
-                  id="cardholderName"
-                  type="text"
-                  placeholder="Cardholder's Name"
-                />
+            {({ values, errors, touched, handleChange }) => {
+              const price = 1000;
+              const shipping = values.shippingMethod === "express" ? 20 : 10;
+              const subtotal = values.quantity * price;
+              const total = subtotal + shipping;
 
-                <FieldInputCardDetails
-                  name="cardNumber"
-                  label="Card Number"
-                  id="cardNumber"
-                  type="text"
-                  placeholder="1234 5678 9012 3457"
-                />
+              return (
+                <Form>
+                  <div className="mt-4">
+                    <FieldInputCardDetails
+                      name="cardholderName"
+                      label="Cardholder's Name"
+                      id="cardholderName"
+                      type="text"
+                      placeholder="Cardholder's Name"
+                    />
 
-                <div className="row mb-4">
-                  <div className="col-md-6">
                     <FieldInputCardDetails
-                      name="exp"
-                      label="Expiration"
-                      id="exp"
+                      name="cardNumber"
+                      label="Card Number"
+                      id="cardNumber"
                       type="text"
-                      placeholder="MM/YYYY"
+                      placeholder="1234 5678 9012 3457"
                     />
+
+                    <div className="row mb-4">
+                      <div className="col-md-6">
+                        <FieldInputCardDetails
+                          name="exp"
+                          label="Expiration"
+                          id="exp"
+                          type="text"
+                          placeholder="MM/YYYY"
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <FieldInputCardDetails
+                          name="cvv"
+                          label="CVV"
+                          id="cvv"
+                          type="text"
+                          placeholder="●●●"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Input Quantity */}
+                    <div className="mb-3">
+                      <label
+                        htmlFor="quantity"
+                        className="form-label text-white"
+                      >
+                        Quantity
+                      </label>
+                      <input
+                        id="quantity"
+                        name="quantity"
+                        type="number"
+                        className="form-control"
+                        min="1"
+                        value={values.quantity}
+                        onChange={handleChange}
+                      />
+                      {touched.quantity && errors.quantity ? (
+                        <div className="text-warning">{errors.quantity}</div>
+                      ) : null}
+                    </div>
+
+                    {/* Select Shipping Method */}
+                    <div className="mb-4">
+                      <label
+                        htmlFor="shippingMethod"
+                        className="form-label text-white"
+                      >
+                        Shipping Method
+                      </label>
+                      <select
+                        id="shippingMethod"
+                        name="shippingMethod"
+                        className="form-select"
+                        value={values.shippingMethod}
+                        onChange={handleChange}
+                      >
+                        <option value="standard">Standard ($10)</option>
+                        <option value="express">Express ($20)</option>
+                      </select>
+                      {touched.shippingMethod && errors.shippingMethod ? (
+                        <div className="text-warning">
+                          {errors.shippingMethod}
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
-                  <div className="col-md-6">
-                    <FieldInputCardDetails
-                      name="cvv"
-                      label="CVV"
-                      id="cvv"
-                      type="text"
-                      placeholder="●●●"
-                    />
+
+                  {/* Phần tính toán subtotal, shipping, total */}
+                  <hr className="my-4" />
+                  <div className="d-flex justify-content-between">
+                    <p className="mb-2">Subtotal</p>
+                    <p className="mb-2">${subtotal.toFixed(2)}</p>
                   </div>
-                </div>
-              </div>
-            </Form>
+                  <div className="d-flex justify-content-between">
+                    <p className="mb-2">Shipping</p>
+                    <p className="mb-2">${shipping.toFixed(2)}</p>
+                  </div>
+                  <div className="d-flex justify-content-between mb-4">
+                    <p className="mb-2">Total (Incl. taxes)</p>
+                    <p className="mb-2">${total.toFixed(2)}</p>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="btn btn-info btn-block btn-lg"
+                  >
+                    <div className="d-flex justify-content-between">
+                      <span>${total.toFixed(2)}</span>
+                      <span>
+                        Checkout{" "}
+                        <i className="fas fa-long-arrow-alt-right ms-2" />
+                      </span>
+                    </div>
+                  </button>
+                </Form>
+              );
+            }}
           </Formik>
-          <hr className="my-4" />
-          <div className="d-flex justify-content-between">
-            <p className="mb-2">Subtotal</p>
-            <p className="mb-2">$4798.00</p>
-          </div>
-          <div className="d-flex justify-content-between">
-            <p className="mb-2">Shipping</p>
-            <p className="mb-2">$20.00</p>
-          </div>
-          <div className="d-flex justify-content-between mb-4">
-            <p className="mb-2">Total(Incl. taxes)</p>
-            <p className="mb-2">$4818.00</p>
-          </div>
-          <button
-            type="button"
-            data-mdb-button-init=""
-            data-mdb-ripple-init=""
-            className="btn btn-info btn-block btn-lg"
-          >
-            <div className="d-flex justify-content-between">
-              <span>$4818.00</span>
-              <span>
-                Checkout <i className="fas fa-long-arrow-alt-right ms-2" />
-              </span>
-            </div>
-          </button>
         </div>
       </div>
     </div>
