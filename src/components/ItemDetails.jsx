@@ -1,7 +1,7 @@
 import React from "react";
 import { MDBInput } from "mdb-react-ui-kit";
 
-function FieldInput() {
+function ItemDetails() {
   return (
     <div>
       <div className="card mb-3">
@@ -39,4 +39,4 @@ function FieldInput() {
   );
 }
 
-export default FieldInput;
+export default ItemDetails;

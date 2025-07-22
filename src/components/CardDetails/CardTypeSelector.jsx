@@ -1,27 +1,3 @@
-// import React from "react";
-
-// function CardTypeSelector() {
-//   return (
-//     <div>
-//       <p className="small mb-2">Card type</p>
-//       <a href="#!" type="submit" className="text-white ">
-//         <i className="fab fa-cc-mastercard fa-2x me-2" />
-//       </a>
-//       <a href="#!" type="submit" className="text-white">
-//         <i className="fab fa-cc-visa fa-2x me-2" />
-//       </a>
-//       <a href="#!" type="submit" className="text-white">
-//         <i className="fab fa-cc-amex fa-2x me-2" />
-//       </a>
-//       <a href="#!" type="submit" className="text-white">
-//         <i className="fab fa-cc-paypal fa-2x" />
-//       </a>
-//     </div>
-//   );
-// }
-
-// export default CardTypeSelector;
-
 import React from "react";
 import { useFormikContext } from "formik";
 

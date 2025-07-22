@@ -1,5 +1,5 @@
 import React from "react";
-import FieldInput from "./FieldInput";
+import ItemDetails from "./ItemDetails";
 import CardDetails from "./CardDetails/CardDetails";
 import { MDBInput } from "mdb-react-ui-kit";
 import { formikProps } from "./CardDetails/FormikProps";
@@ -35,10 +35,10 @@ function ShoppingCartTemplate() {
                           </p>
                         </div>
                       </div>
-                      <FieldInput></FieldInput>
-                      <FieldInput></FieldInput>
-                      <FieldInput></FieldInput>
-                      <FieldInput></FieldInput>
+                      <ItemDetails></ItemDetails>
+                      <ItemDetails></ItemDetails>
+                      <ItemDetails></ItemDetails>
+                      <ItemDetails></ItemDetails>
                     </div>
                     <CardDetails {...formikProps} />;
                   </div>
